@@ -19,4 +19,12 @@ public:
 	AABGameMode();
 
 	virtual void OnPlayerDead() override;
+	
+	//멀티플레이에 중요한 로그인 관련 함수들.
+	//로그인 관련 함수들
+	virtual void PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage) override;
+	virtual APlayerController* Login(UPlayer * NewPlayer, ENetRole InRemoteRole, const FString& Portal, const FString& Options, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage) override;
+	virtual void PostLogin(class APlayerController* NewPlayerController) override;
+	virtual void StartPlay() override;
+	// 로그인 관련 함수들.
 };

@@ -24,3 +24,26 @@ void AABGameMode::OnPlayerDead()
 {
 
 }
+
+// 로그인 관련 함수들
+void AABGameMode::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId,
+	FString& ErrorMessage)
+{
+	Super::PreLogin(Options, Address, UniqueId, ErrorMessage);
+}
+// 로그인 관련 함수들
+APlayerController* AABGameMode::Login(UPlayer* NewPlayer, ENetRole InRemoteRole, const FString& Portal,
+	const FString& Options, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage)
+{
+	return Super::Login(NewPlayer, InRemoteRole, Portal, Options, UniqueId, ErrorMessage);
+}
+// 로그인 관련 함수들
+void AABGameMode::PostLogin(class APlayerController* NewPlayerController)
+{
+	Super::PostLogin(NewPlayerController);
+}
+// 로그인 관련 함수들
+void AABGameMode::StartPlay()
+{
+	Super::StartPlay();
+}
