@@ -72,6 +72,7 @@ Saved/**/*.json
 Saved/*.png
 Saved/Autosaves/*
 Saved/
+Plugins/Developer/
 # Compiled source files for the engine to use
 Intermediate/*
 Plugins/*/Intermediate/*

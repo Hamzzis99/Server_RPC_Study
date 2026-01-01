@@ -7,9 +7,13 @@
 
 // 네트워크 모드 정보를 로그에 표시하기 위한 매크로
 #if WITH_EDITOR
-#define LOG_NETMODEINFO ((GetNetMode() == ENetMode::NM_Client) ? *FString::Printf(TEXT("CLIENT%d"), GetWorld() ? GetWorld()->GetOutermost()->GetPIEInstanceID() : 0) : ((GetNetMode() == ENetMode::NM_Standalone) ? TEXT("STANDALONE") : TEXT("SERVER")))
+#define LOG_NETMODEINFO ((GetNetMode() == ENetMode::NM_Client) ? *FString::Printf(TEXT("CLIENT%d"), GetWorld() ? GetWorld()->GetOutermost()->GetPIEInstanceID() : 0) : \
+((GetNetMode() == ENetMode::NM_Standalone) ? TEXT("STANDALONE") : \
+((GetNetMode() == ENetMode::NM_ListenServer) ? TEXT("LISTENSERVER") : TEXT("DEDICATEDSERVER"))))
 #else
-#define LOG_NETMODEINFO ((GetNetMode() == ENetMode::NM_Client) ? TEXT("CLIENT") : ((GetNetMode() == ENetMode::NM_Standalone) ? TEXT("STANDALONE") : TEXT("SERVER")))
+#define LOG_NETMODEINFO ((GetNetMode() == ENetMode::NM_Client) ? TEXT("CLIENT") : \
+((GetNetMode() == ENetMode::NM_Standalone) ? TEXT("STANDALONE") : \
+((GetNetMode() == ENetMode::NM_ListenServer) ? TEXT("LISTENSERVER") : TEXT("DEDICATEDSERVER"))))
 #endif
 
 #define LOG_CALLINFO ANSI_TO_TCHAR(__FUNCTION__) // 언제 로그가 찍혔는지 알려주는 것?
