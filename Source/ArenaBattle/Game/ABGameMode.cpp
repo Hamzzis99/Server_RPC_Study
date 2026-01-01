@@ -3,6 +3,8 @@
 
 #include "Game/ABGameMode.h"
 #include "ABGameMode.h"
+
+#include "ArenaBattle.h"
 #include "Player/ABPlayerController.h"
 
 AABGameMode::AABGameMode()
@@ -26,24 +28,36 @@ void AABGameMode::OnPlayerDead()
 }
 
 // 로그인 관련 함수들
-void AABGameMode::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId,
-	FString& ErrorMessage)
+void AABGameMode::PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage)
 {
+	AB_LOG(LogABNetwork, Log, TEXT("%s"), TEXT("Begin"));
 	Super::PreLogin(Options, Address, UniqueId, ErrorMessage);
+	AB_LOG(LogABNetwork, Log, TEXT("%s"), TEXT("End"));
 }
+
 // 로그인 관련 함수들
-APlayerController* AABGameMode::Login(UPlayer* NewPlayer, ENetRole InRemoteRole, const FString& Portal,
-	const FString& Options, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage)
+APlayerController* AABGameMode::Login(UPlayer* NewPlayer, ENetRole InRemoteRole, const FString& Portal, const FString& Options, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage)
 {
-	return Super::Login(NewPlayer, InRemoteRole, Portal, Options, UniqueId, ErrorMessage);
+	AB_LOG(LogABNetwork, Log, TEXT("%s"), TEXT("Begin"));
+	
+	APlayerController* NewPlayerController =  Super::Login(NewPlayer, InRemoteRole, Portal, Options, UniqueId, ErrorMessage);
+	AB_LOG(LogABNetwork, Log, TEXT("%s"), TEXT("End"));
+	return NewPlayerController;
+	
 }
+
 // 로그인 관련 함수들
-void AABGameMode::PostLogin(class APlayerController* NewPlayerController)
+void AABGameMode::PostLogin(class APlayerController* NewPlayer)
 {
-	Super::PostLogin(NewPlayerController);
+	AB_LOG(LogABNetwork, Log, TEXT("%s"), TEXT("Begin"));
+	Super::PostLogin(NewPlayer);
+	AB_LOG(LogABNetwork, Log, TEXT("%s"), TEXT("End"));
 }
+
 // 로그인 관련 함수들
 void AABGameMode::StartPlay()
 {
+	AB_LOG(LogABNetwork, Log, TEXT("%s"), TEXT("Begin"));
 	Super::StartPlay();
+	AB_LOG(LogABNetwork, Log, TEXT("%s"), TEXT("End"));
 }
