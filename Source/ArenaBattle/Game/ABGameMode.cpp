@@ -6,6 +6,7 @@
 
 #include "ArenaBattle.h"
 #include "Player/ABPlayerController.h"
+#include "Game/ABGameState.h"
 
 AABGameMode::AABGameMode()
 {
@@ -20,6 +21,8 @@ AABGameMode::AABGameMode()
 	{
 		PlayerControllerClass = PlayerControllerClassRef.Class;
 	}
+	
+	GameStateClass = AABGameState::StaticClass(); // 게임 모드에서 사용할 게임 상태 클래스 설정
 }
 
 void AABGameMode::OnPlayerDead()
