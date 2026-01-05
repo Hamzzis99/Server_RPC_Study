@@ -32,9 +32,16 @@ public:
 	
 public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override; // 멀티플레이어 환경에서 변수 복제를 위한 함수 재정의
+	virtual void OnActorChannelOpen(class FInBunch& InBunch, class UNetConnection* Connection) override;
 	
-	UPROPERTY(Replicated) // Replicated를 달아야 서버-클라이언트 간 동기화가 이루어짐
-	float ServerRotationYaw;
+	//UPROPERTY(Replicated) // Replicated를 달아야 서버-클라이언트 간 동기화가 이루어짐
+	UPROPERTY(ReplicatedUsing = OnRep_ServerRotationYaw) // Replicated를 Tick마다가 아닌 필요할 때마다 호출
+	float ServerRotationYaw; // 분수대 회전값을 서버-클라이언트 간 동기화할 변수 (OnRep_ServerRotationYaw 함수에 따라 동기화)
+	
+	UFUNCTION() // 언리얼에서 인식할 수 있는 Function 
+	void OnRep_ServerRotationYaw(); // RepNotify 콜백 함수 선언
 	
 	float RotationRate = 30.f; // 분수대 회전 속도
+	
+	//액터 리플리케이션을 하려면 채널을 지정해야 하는데...
 };
