@@ -34,6 +34,7 @@ AABFountain::AABFountain()
 	
 	bReplicates = true; // 멀티플레이 액터 복제 설정
 	NetUpdateFrequency = 1.0f; // 네트워크 업데이트 빈도 설정 (초당 10회) (작을수록 좋은 것.) 프레임이 끊겨보이는거 (틱마다인데 확실히 보인다.)
+	NetCullDistanceSquared = 4000000.0f; // 네트워크 컬링 거리 설정 (2000 유닛)
 }
 
 // Called when the game starts or when spawned
@@ -68,6 +69,24 @@ void AABFountain::Tick(float DeltaTime)
 	// 	NewRotator.Yaw = ServerRotationYaw;
 	// 	RootComponent->SetWorldRotation(NewRotator);
 	// }
+	else
+	{
+		ClientTimeSinceUpdate += DeltaTime; // 마지막 업데이트 이후 경과한 시간 누적
+		if (ClientTimeBetweenLastUpdate < KINDA_SMALL_NUMBER) // 이전 업데이트 간격이 너무 작으면 보간하지 않음
+		{
+			return; // 0으로 나누는 상황 방지
+		}
+		
+		// 서버로부터 받은 회전값에 다음 예상 회전값 계산 (이렇게 하면 서버에 대한 부담이 없다???) 아무튼 클라이언트내에서 보정해주는 값들.
+		// 진짜 이건 너무 중요하다. 분수대가 도는 회전값을 통해 만드는 것.
+		const float EstimateRotationYaw = ServerRotationYaw + RotationRate * ClientTimeBetweenLastUpdate; 
+		const float LerpRatio = ClientTimeSinceUpdate / ClientTimeBetweenLastUpdate; // 보간 비율 계산
+		
+		FRotator ClientRotator = RootComponent->GetComponentRotation(); // 현재 클라이언트 회전값
+		const float ClientNewYaw = FMath::Lerp(ServerRotationYaw, EstimateRotationYaw, LerpRatio); // 선형 보간을 통해 새로운 Yaw 값 계산
+		ClientRotator.Yaw = ClientNewYaw; // 보간된 Yaw 값 설정
+		RootComponent->SetWorldRotation(ClientRotator); // 회전값 적용
+	}
 }
 	
 // 멀티플레이어 환경에서 변수 복제를 위한 함수 재정의
@@ -87,6 +106,17 @@ void AABFountain::OnActorChannelOpen(class FInBunch& InBunch, class UNetConnecti
 	AB_LOG(LogABNetwork, Log, TEXT("%s"), TEXT("End"));
 }
 
+bool AABFountain::IsNetRelevantFor(const AActor* RealViewer, const AActor* ViewTarget, const FVector& SrcLocation) const
+{
+	bool NetRelevantFor = Super::IsNetRelevantFor(RealViewer, ViewTarget, SrcLocation); // 기본 네트워크 관련성 확인
+	if (!NetRelevantFor)
+	{
+		AB_LOG(LogABNetwork, Log, TEXT("Not Relevant:[%s] %s"), *RealViewer->GetName(), *SrcLocation.ToCompactString()); // 네트워크 관련성이 없는 경우 로그 출력
+	}
+	
+	return false; // 항상 비관련으로 설정 (이 액터는 네트워크 관련성이 없음)
+}
+
 void AABFountain::OnRep_ServerRotationYaw() // 동적 액터는 이런 식으로 RepNotify 콜백 함수를 구현해야함.
 {
 	AB_LOG(LogABNetwork, Log, TEXT("YAW : %f"), ServerRotationYaw); // RepNotify 콜백 함수 구현 (서버에서 클라이언트로 값이 복제될 때마다 호출됨)
@@ -94,5 +124,8 @@ void AABFountain::OnRep_ServerRotationYaw() // 동적 액터는 이런 식으로
 	FRotator NewRotator = RootComponent->GetComponentRotation();
 	NewRotator.Yaw = ServerRotationYaw;
 	RootComponent->SetWorldRotation(NewRotator);
+	
+	ClientTimeBetweenLastUpdate = ClientTimeSinceUpdate; // 마지막 업데이트 이후 경과한 시간을 이전 업데이트 간격으로 저장
+	ClientTimeSinceUpdate = 0.0f; // 경과 시간 초기화
 }
 
